@@ -1,6 +1,7 @@
 import math
 
 import pandas as pd
+import numpy as np
 
 
 def read_dataset(path):
@@ -10,6 +11,7 @@ def read_dataset(path):
     return df
 
 
+# is_round: if column values are not continuous, then is_round must be true
 def fill_with_average(df, column_name, is_round):
     df_size = len(df)
     target_column = df[column_name]
@@ -61,7 +63,7 @@ def fill_with_median_2(df, column_name):
     indexes = pd.isnull(df).any(1).nonzero()[0]
     median = pd.DataFrame.median(df)
     for i in indexes:
-        target_column[i] = median
+        target_column[i] = median,
 
 
 def fill_with_mean_2(df, column_name):
@@ -76,9 +78,30 @@ def fill_with_knn(df, column_name, is_round):
     print("Not implemented yet")
 
 
+# Split crimes by their times to 8 categories (3-hour frames)
 def categorize_time_occurred(df: pd.DataFrame):
     df['Time Occurred'] = df['Time Occurred'].floordiv(300)
+    df['Time Occurred'] = pd.to_numeric(df['Time Occurred'])
 
 
+# Create new column for month of the crime as categorical data from 0:Jan to 11:Dec
+def create_month_occurred_column(df: pd.DataFrame):
+    df['Date Occurred'] = pd.to_datetime(df['Date Occurred'], format='%m/%d/%Y')
+    df['Month Occurred'] = df['Date Occurred'].dt.month
+    df['Month Occurred'] = pd.to_numeric(df['Month Occurred'])
+
+
+# Create new column which describes which day of week the crime occurred, 0:Mon to 6:Sun
+def create_day_of_week_column(df: pd.DataFrame):
+    df['Day of Week'] = df['Date Occurred'].dt.dayofweek
+    df['Day of Week'] = pd.to_numeric(df['Day of Week'])
+
+
+# Extract Lat-Long information from Location column and create columns for them to use later
 def create_geolocation_columns(df: pd.DataFrame):
-    print("Not implemented yet")
+    df['Location '].replace(np.NaN, '(0,0)')
+    df[['Latitude', 'Longitude']] = df['Location '].str.split(',', expand=True)
+    df['Latitude'] = df['Latitude'].str[1:]
+    df['Longitude'] = df['Longitude'].str[:-1]
+    df['Longitude'] = pd.to_numeric(df['Longitude'])
+    df['Latitude'] = pd.to_numeric(df['Latitude'])

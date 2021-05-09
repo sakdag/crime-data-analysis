@@ -3,6 +3,7 @@ import timeit
 import pandas as pd
 import numpy as np
 from sklearn.impute import KNNImputer
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
 
 def read_dataset(path):
@@ -119,3 +120,21 @@ def create_geolocation_columns(df: pd.DataFrame):
     df['Longitude'] = df['Longitude'].str[:-1]
     df['Longitude'] = pd.to_numeric(df['Longitude'])
     df['Latitude'] = pd.to_numeric(df['Latitude'])
+
+
+def impute_victim_age_using_crime_codes(df: pd.DataFrame):
+    df_new = df[['Crime Code', 'Victim Age']]
+
+    label_encoder = LabelEncoder()
+    df_new['Crime Code'] = label_encoder.fit_transform(df_new['Crime Code'])
+    enc = OneHotEncoder(handle_unknown='ignore')
+
+    enc_df = pd.DataFrame(enc.fit_transform(df_new[['Crime Code']]).toarray())
+    df_new = df_new.join(enc_df)
+    df_new.drop(columns={'Crime Code'})
+    print(df_new)
+
+    imputer = KNNImputer(n_neighbors=3)
+    df_new = imputer.fit_transform(df_new)
+    print(df_new['Victim Age'].unique())
+    print(df_new)

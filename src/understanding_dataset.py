@@ -1,7 +1,8 @@
 import math
-
+import timeit
 import pandas as pd
 import numpy as np
+from sklearn.impute import KNNImputer
 
 
 def read_dataset(path):
@@ -54,28 +55,41 @@ def get_nan_valid_tuple(df, column_name):
         if math.isnan(value):
             nan_list.append(i)
         else:
-            value_list.append(i)
+            value_list.append(target_column[i])
     return nan_list, value_list
 
 
+'''
 def fill_with_median_2(df, column_name):
     target_column = df[column_name]
-    indexes = pd.isnull(df).any(1).nonzero()[0]
-    median = pd.DataFrame.median(df)
+    indexes = df[column_name].index[df[column_name].apply(np.isnan)]
+    median = pd.DataFrame.median(target_column)
     for i in indexes:
-        target_column[i] = median,
+        target_column[i] = median
 
 
 def fill_with_mean_2(df, column_name):
     target_column = df[column_name]
-    indexes = pd.isnull(df).any(1).nonzero()[0]
-    mean = pd.DataFrame.mean(df)
+    indexes = df[column_name].index[df[column_name].apply(np.isnan)]
+    mean = pd.DataFrame.mean(target_column)
     for i in indexes:
         target_column[i] = mean
+'''
 
 
-def fill_with_knn(df, column_name, is_round):
-    print("Not implemented yet")
+# WRONG
+def fill_with_knn_numeric(df, column_name):
+    target_column = df[column_name]
+    imputer = KNNImputer(n_neighbors=2)
+    return imputer.fit_transform([target_column])
+
+
+# WRONG
+def fill_with_knn_categorical(df, column_name):
+    mapped_column = df.cat.codes
+    imputer = KNNImputer(n_neighbors=2)
+    imputer.fit_transform(mapped_column)
+    return mapped_column
 
 
 # Split crimes by their times to 8 categories (3-hour frames)

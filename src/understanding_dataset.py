@@ -9,11 +9,11 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
     df = read_dataset(original_file_name)
 
-    column_list = {"Date Reported", "Area ID", "Area Name",
-                   "Reporting District", "MO Codes", "Weapon Used Code",
-                   "Weapon Description", "Status Code", "Status Description",
-                   "Crime Code 1", "Crime Code 2", "Crime Code 3", "Crime Code 4",
-                   "Address", "Cross Street"}
+    column_list = {'Date Reported', 'Area ID', 'Area Name',
+                   'Reporting District', 'MO Codes', 'Weapon Used Code',
+                   'Weapon Description', 'Status Code', 'Status Description',
+                   'Crime Code 1', 'Crime Code 2', 'Crime Code 3', 'Crime Code 4',
+                   'Address', 'Cross Street'}
     df = df.drop(columns=column_list)
 
     categorize_time_occurred(df)
@@ -69,7 +69,7 @@ def print_number_of_examples_in_crime_codes(df: pd.DataFrame):
 def read_dataset(path):
     df = pd.read_csv(path)
     df_size = len(df)
-    print("Data Size: " + str(df_size))
+    print('Data Size: ' + str(df_size))
     return df
 
 
@@ -105,6 +105,23 @@ def fill_with_median(df, column_name, is_round):
         target_column[i] = median
 
 
+def fill_with_mod(df, column_name):
+    target_column = df[column_name]
+    nan_list, value_list = get_nan_valid_tuple(df, column_name)
+
+    groups = df.groupby(column_name)
+    mod = ''
+    mod_value = 0
+    for sub in groups:
+        len_sub = len(sub[1])
+        if mod_value <= len_sub:
+            mod_value = len_sub
+            mod = sub[0]
+
+    for i in nan_list:
+        target_column[i] = mod
+
+
 def get_nan_valid_tuple(df, column_name):
     df_size = len(df)
     target_column = df[column_name]
@@ -113,7 +130,12 @@ def get_nan_valid_tuple(df, column_name):
 
     for i in range(0, df_size):
         value = target_column[i]
-        if math.isnan(value):
+        if isinstance(value, str):
+            if value == np.nan:
+                nan_list.append(i)
+            else:
+                value_list.append(target_column[i])
+        elif math.isnan(value):
             nan_list.append(i)
         else:
             value_list.append(target_column[i])
@@ -143,14 +165,6 @@ def fill_with_knn_numeric(df, column_name):
     target_column = df[column_name]
     imputer = KNNImputer(n_neighbors=2)
     return imputer.fit_transform([target_column])
-
-
-# WRONG
-def fill_with_knn_categorical(df, column_name):
-    mapped_column = df.cat.codes
-    imputer = KNNImputer(n_neighbors=2)
-    imputer.fit_transform(mapped_column)
-    return mapped_column
 
 
 # Split crimes by their times to 8 categories (3-hour frames)

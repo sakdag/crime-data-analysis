@@ -45,10 +45,26 @@ def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
     # Remove crime codes that has little examples in dataset
     df = df.groupby('Crime Code').filter(lambda x: len(x) > 500)
 
+    # Temporary save
     df.to_csv(preprocessed_file_name, index=False)
 
-    # ud.impute_victim_age_using_crime_codes(df)
-    # ud.fill_with_average(df, 'Victim Age', True)
+    df = read_dataset(preprocessed_file_name)
+    # Rename the columns
+    df = df.rename(columns={'DR Number': 'DRNumber', 'Time Occurred': 'TimeOccurred', 'Crime Code': 'CrimeCode',
+                            'Crime Code Description': 'CrimeCodeDescription', 'Victim Age': 'VictimAge',
+                            'Victim Sex': 'VictimSex', 'Victim Descent': 'VictimDescent',
+                            'Premise Code': 'PremiseCode', 'Premise Description': 'PremiseDescription',
+                            'Month Occurred': 'MonthOccurred', 'Day of Week': 'DayOfWeek'})
+
+    # Interpolate the empty values
+    fill_with_mod(df, 'VictimDescent')
+    fill_with_mod(df, 'VictimSex')
+    fill_with_average(df, 'VictimAge', True)
+
+    # Save
+    df.to_csv(preprocessed_file_name, index=False)
+
+
 
 
 # Print number of examples in each crime code

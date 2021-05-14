@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import understanding_dataset as ud
+import crime_preprocessor as ud
 
 
 def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):

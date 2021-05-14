@@ -1,7 +1,7 @@
 import crime_preprocessor as ud
 import census_preprocessor as cp
 import dataset_correlation as dc
-import crime_classification as cc
+import crime_classification_lgbm as cc
 from sklearn.preprocessing import LabelEncoder
 
 if __name__ == "__main__":

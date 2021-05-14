@@ -11,8 +11,7 @@ def construct_model_with_decision_tree(df):
 
 
 def get_x_y_columns(df):
-    x_columns = ['DRNumber', 'TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'PremiseCode',
-                 'MonthOccurred', 'DayOfWeek']
+    x_columns = ['TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'PremiseCode', 'MonthOccurred', 'DayOfWeek']
     y_column = ['CrimeCode']
 
     X = df[x_columns]

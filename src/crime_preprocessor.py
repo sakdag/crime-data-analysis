@@ -65,8 +65,6 @@ def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
     df.to_csv(preprocessed_file_name, index=False)
 
 
-
-
 # Print number of examples in each crime code
 def print_number_of_examples_in_crime_codes(df: pd.DataFrame):
     code_dict = dict()

@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import CategoricalNB
 from sklearn.preprocessing import LabelEncoder
+import classification_reporter as cr
 
 
 def classify_and_report(df: pd.DataFrame, number_of_folds: int):
@@ -18,6 +18,8 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
 
     clf = CategoricalNB()
     total_accuracy = 0
+    actual_y = list()
+    predicted_y = list()
 
     for i in range(number_of_folds):
         # Get training set by appending elements other than current fold
@@ -33,11 +35,9 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
 
         clf.fit(x, y.values.ravel())
 
-        test_y = test_set[label].to_list()
+        actual_y.extend(test_set[label].to_list())
         test_x = test_set.drop([label], axis=1)
 
-        predicted_y = clf.predict(test_x)
+        predicted_y.extend(list(clf.predict(test_x)))
 
-        total_accuracy += accuracy_score(test_y, predicted_y)
-
-    print('Total Accuracy: ', total_accuracy / 3 * 100, '%')
+    cr.report(actual_y, predicted_y)

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import CategoricalNB
 from sklearn.preprocessing import LabelEncoder
 
@@ -12,11 +13,11 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
     df[['VictimSex', 'VictimDescent']] = df[['VictimSex', 'VictimDescent']].apply(LabelEncoder().fit_transform)
 
     label = 'CrimeCode'
+    df = df.sample(frac=1).reset_index(drop=True)
     split_dfs = np.array_split(df, number_of_folds)
 
     clf = CategoricalNB()
-
-    number_of_right_guesses = 0
+    total_accuracy = 0
 
     for i in range(number_of_folds):
         # Get training set by appending elements other than current fold
@@ -37,10 +38,6 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
 
         predicted_y = clf.predict(test_x)
 
-        for j in range(len(predicted_y)):
-            if predicted_y[j] == test_y[j]:
-                number_of_right_guesses += 1
+        total_accuracy += accuracy_score(test_y, predicted_y)
 
-    total_mse = float(number_of_right_guesses) / float(len(df))
-    print('Total MSE: ', total_mse * 100, '%')
-
+    print('Total Accuracy: ', total_accuracy / 3 * 100, '%')

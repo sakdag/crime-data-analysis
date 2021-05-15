@@ -44,11 +44,18 @@ def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
 
     # Remove crime codes that has little examples in dataset
     df = df.groupby('Crime Code').filter(lambda x: len(x) > 500)
+    df = df.groupby('Victim Descent').filter(lambda x: len(x) > 100)
+    df = df.groupby('Victim Sex').filter(lambda x: len(x) > 100)
+    df = df.groupby('Premise Code').filter(lambda x: len(x) > 100)
+
+    df.loc[df['Victim Sex'] == 'X', 'Victim Sex'] = np.nan
+    df.loc[df['Victim Descent'] == 'X', 'Victim Descent'] = np.nan
 
     # Temporary save
     df.to_csv(preprocessed_file_name, index=False)
 
     df = read_dataset(preprocessed_file_name)
+
     # Rename the columns
     df = df.rename(columns={'DR Number': 'DRNumber', 'Time Occurred': 'TimeOccurred', 'Crime Code': 'CrimeCode',
                             'Crime Code Description': 'CrimeCodeDescription', 'Victim Age': 'VictimAge',

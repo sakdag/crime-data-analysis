@@ -2,6 +2,7 @@ import crime_preprocessor as ud
 import census_preprocessor as cp
 import dataset_correlation as dc
 import crime_classification_lgbm as cc
+import crime_classification_categorical_nb as cnb
 from sklearn.preprocessing import LabelEncoder
 
 if __name__ == "__main__":
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     census_dataset_file_name = '2010-census-populations-by-zip-code.csv'
     preprocessed_census_dataset_file_name = '2010-census-populations-by-zip-code-preprocessed.csv'
 
-    # ud.preprocess_and_save(original_dataset_file_name, preprocessed_dataset_file_name)
+    # ud.preprocess_and_save(crime_dataset_file_name, preprocessed_crime_dataset_file_name)
     # cp.preprocess_and_save(census_dataset_file_name, preprocessed_census_dataset_file_name)
 
     df = ud.read_dataset(preprocessed_crime_dataset_file_name)
@@ -20,10 +21,12 @@ if __name__ == "__main__":
 
     # dc.correlate_and_save(df, census_df, correlated_crime_dataset_file_name)
 
-    df[['VictimSex', 'VictimDescent']] = df[['VictimSex', 'VictimDescent']].apply(LabelEncoder().fit_transform)
+    # df[['VictimSex', 'VictimDescent']] = df[['VictimSex', 'VictimDescent']].apply(LabelEncoder().fit_transform)
+    #
+    # experiments = cc.get_experiments(df)
+    #
+    # cc.print_error(cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[0][0]), experiments[0][1])),
+    #                cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[1][0]), experiments[1][1])),
+    #                cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[2][0]), experiments[2][1])))
 
-    experiments = cc.get_experiments(df)
-
-    cc.print_error(cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[0][0]), experiments[0][1])),
-                   cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[1][0]), experiments[1][1])),
-                   cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[2][0]), experiments[2][1])))
+    cnb.classify_and_report(df, 3)

@@ -59,6 +59,7 @@ def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
     # Interpolate the empty values
     fill_with_mod(df, 'VictimDescent')
     fill_with_mod(df, 'VictimSex')
+    fill_with_mod(df, 'PremiseCode')
     fill_with_average(df, 'VictimAge', True)
 
     # Save

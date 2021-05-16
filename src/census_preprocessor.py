@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
 import crime_preprocessor as ud
+import crime_classification_utils as ccu
 
 
 def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
-    census_df = ud.read_dataset(original_file_name)
+    census_df = ccu.read_dataset(original_file_name)
     zip_codes_dataset_file_name = 'uszips.csv'
-    zip_codes_df = ud.read_dataset(zip_codes_dataset_file_name)
+    zip_codes_df = ccu.read_dataset(zip_codes_dataset_file_name)
 
     insert_geolocation_info(census_df, zip_codes_df)
     print(census_df)

@@ -1,20 +1,20 @@
 import math
 import pandas as pd
-from lightgbm import LGBMRegressor
+from lightgbm import LGBMClassifier
 
 
 def construct_model_with_decision_tree(df):
     X, y = get_x_y_columns(df)
-    dt = LGBMRegressor()
-    dt.fit(X, y)
+    dt = LGBMClassifier()
+    dt.fit(X, y.values.ravel())
     return dt
 
 
 def get_x_y_columns(df):
-    x_columns = ['TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'PremiseCode', 'MonthOccurred', 'DayOfWeek']
+    drop_columns = ['DRNumber', 'CrimeCode', 'CrimeCodeDescription', 'PremiseDescription', 'Latitude', 'Longitude']
     y_column = ['CrimeCode']
 
-    X = df[x_columns]
+    X = df.drop(drop_columns, axis=1)
     y = df[y_column]
 
     return X, y
@@ -47,14 +47,26 @@ def get_train_test_data(train1, train2, test):
 
 
 def calculate_error(y_tuple):
-    return calculate_wrong_label_ratio(y_tuple[1], y_tuple[0])
+    return calculate_true_label_ratio(y_tuple[1], y_tuple[0])
 
 
 def print_error(exp1_error, exp2_error, exp3_error):
     print('Ratio: ' + str(100 * (exp1_error + exp2_error + exp3_error) / 3) + '%')
 
 
-# Mean Squared Error calculation
-def calculate_wrong_label_ratio(y, forecast):
+# Accuracy
+def calculate_true_label_ratio(y, forecast):
     y_size = len(y)
-    return sum((1 if a != b else 0) for a, b in zip(y, forecast)) / y_size
+    return sum((1 if a == b else 0) for a, b in zip(y['CrimeCode'], forecast)) / y_size
+
+
+def obtain_ohe_df(df, column_names):
+    for column_name in column_names:
+        # Get one hot encoding
+        one_hot = pd.get_dummies(df[column_name], prefix=column_name)
+        # Drop column B as it is now encoded
+        df = df.drop(column_name, axis=1)
+        # Join the encoded df
+        df = df.join(one_hot)
+
+    return df

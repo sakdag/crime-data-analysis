@@ -73,6 +73,76 @@ def preprocess_and_save(original_file_name: str, preprocessed_file_name: str):
     df.to_csv(preprocessed_file_name, index=False)
 
 
+def preprocess_and_save_before_ohe(original_file_name: str, preprocessed_file_name: str):
+    df = read_dataset(original_file_name)
+    childhood = df.loc[df['VictimAge'] <= 14]
+    childhood.loc[childhood['VictimAge'] <= 14, 'VictimAge'] = 'Childhood'
+
+    adolescence = df.loc[np.logical_and(df['VictimAge'] > 14, df['VictimAge'] <= 21)]
+    adolescence.loc[np.logical_and(adolescence['VictimAge'] > 14, adolescence['VictimAge'] <= 21), 'VictimAge'] = 'Adolescence'
+
+    youth = df.loc[np.logical_and(df['VictimAge'] > 21, df['VictimAge'] <= 35)]
+    youth.loc[np.logical_and(youth['VictimAge'] > 21, youth['VictimAge'] <= 35), 'VictimAge'] = 'Youth'
+
+    maturity = df.loc[np.logical_and(df['VictimAge'] > 35, df['VictimAge'] <= 49)]
+    maturity.loc[np.logical_and(maturity['VictimAge'] > 35, maturity['VictimAge'] <= 49), 'VictimAge'] = 'Maturity'
+
+    aging = df.loc[np.logical_and(df['VictimAge'] > 49, df['VictimAge'] <= 63)]
+    aging.loc[np.logical_and(aging['VictimAge'] > 49, aging['VictimAge'] <= 63), 'VictimAge'] = 'Aging'
+
+    old_age = df.loc[df['VictimAge'] > 63]
+    old_age.loc[old_age['VictimAge'] > 63, 'VictimAge'] = 'Old Age'
+
+    childhood = childhood.append(adolescence, ignore_index=True)
+    childhood = childhood.append(youth, ignore_index=True)
+    childhood = childhood.append(maturity, ignore_index=True)
+    childhood = childhood.append(aging, ignore_index=True)
+    childhood = childhood.append(old_age, ignore_index=True)
+
+    df = childhood
+
+    night = df.loc[df['TimeOccurred'] <= 1]
+    night.loc[night['TimeOccurred'] <= 1, 'TimeOccurred'] = 'Night'
+
+    morning = df.loc[np.logical_and(df['TimeOccurred'] > 1, df['TimeOccurred'] <= 3)]
+    morning.loc[np.logical_and(morning['TimeOccurred'] > 1, morning['TimeOccurred'] <= 3), 'TimeOccurred'] = 'Morning'
+
+    afternoon = df.loc[np.logical_and(df['TimeOccurred'] > 3, df['TimeOccurred'] <= 5)]
+    afternoon.loc[np.logical_and(afternoon['TimeOccurred'] > 3, afternoon['TimeOccurred'] <= 5), 'TimeOccurred'] = 'Afternoon'
+
+    evening = df.loc[np.logical_and(df['TimeOccurred'] > 5, df['TimeOccurred'] <= 7)]
+    evening.loc[np.logical_and(evening['TimeOccurred'] > 5, evening['TimeOccurred'] <= 7), 'TimeOccurred'] = 'Evening'
+
+    night = night.append(morning, ignore_index=True)
+    night = night.append(afternoon, ignore_index=True)
+    night = night.append(evening, ignore_index=True)
+
+    df = night
+
+    winter = df.loc[np.logical_or(df['MonthOccurred'] <= 2, df['MonthOccurred'] == 12)]
+    winter.loc[np.logical_or(winter['MonthOccurred'] <= 2, winter['MonthOccurred'] == 12), 'MonthOccurred'] = 'Winter'
+
+    spring = df.loc[np.logical_and(df['MonthOccurred'] > 2, df['MonthOccurred'] <= 5)]
+    spring.loc[np.logical_and(spring['MonthOccurred'] > 2, spring['MonthOccurred'] <= 5), 'MonthOccurred'] = 'Spring'
+
+    summer = df.loc[np.logical_and(df['MonthOccurred'] > 5, df['MonthOccurred'] <= 8)]
+    summer.loc[np.logical_and(summer['MonthOccurred'] > 5, summer['MonthOccurred'] <= 8), 'MonthOccurred'] = 'Summer'
+
+    fall = df.loc[np.logical_and(df['MonthOccurred'] > 8, df['MonthOccurred'] <= 11)]
+    fall.loc[np.logical_and(fall['MonthOccurred'] > 8, fall['MonthOccurred'] <= 11), 'MonthOccurred'] = 'Fall'
+
+    winter = winter.append(spring, ignore_index=True)
+    winter = winter.append(summer, ignore_index=True)
+    winter = winter.append(fall, ignore_index=True)
+
+    df = winter
+
+    df = df.rename(columns={'VictimAge': 'VictimAgeStage', 'MonthOccurred': 'SeasonOccurred'})
+
+    # Save
+    df.to_csv(preprocessed_file_name, index=False)
+
+
 # Print number of examples in each crime code
 def print_number_of_examples_in_crime_codes(df: pd.DataFrame):
     code_dict = dict()

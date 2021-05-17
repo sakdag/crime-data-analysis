@@ -43,4 +43,4 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
 
         predicted_y.extend(list(clf.predict(test_x)))
 
-    cr.report(actual_y, predicted_y)
+    cr.report(df, actual_y, predicted_y)

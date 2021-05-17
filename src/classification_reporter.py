@@ -1,7 +1,9 @@
+import pandas as pd
 from sklearn import metrics
+import visualization as vs
 
 
-def report(actual_y: list, predicted_y: list):
+def report(df: pd.DataFrame, actual_y: list, predicted_y: list):
 
     # Print total accuracy
     # accuracy = metrics.accuracy_score(actual_y, predicted_y)
@@ -12,3 +14,5 @@ def report(actual_y: list, predicted_y: list):
 
     # Print the precision and recall, among other metrics
     print(metrics.classification_report(actual_y, predicted_y, digits=3))
+
+    vs.plot_confusion_matrix(df, actual_y, predicted_y)

@@ -29,6 +29,16 @@ def construct_pie_chart(df: pd.DataFrame, column_name: str):
     plt.show()
 
 
+def construct_line_chart(df: pd.DataFrame, column_name: str, x_label: str, y_label: str, title: str):
+    values = df[column_name].value_counts().keys().tolist()
+    counts = df[column_name].value_counts().tolist()
+    plt.bar(values, counts, align='center', alpha=0.5)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.show()
+
+
 def plot_confusion_matrix(df: pd.DataFrame, actual_y: list, predicted_y: list):
     labels = df['CrimeCode'].unique().tolist()
     cm = confusion_matrix(actual_y, predicted_y)

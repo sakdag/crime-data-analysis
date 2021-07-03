@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import CategoricalNB
 from sklearn.preprocessing import LabelEncoder
-import classification_reporter as cr
-import crime_preprocessor as cp
+
+import src.utils.classification_reporter as reporter
+import src.preprocessing.crime_preprocessor as crime_prep
 
 
 def classify_and_report(df: pd.DataFrame, number_of_folds: int):
@@ -11,7 +12,7 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
                        'PremiseDescription', 'Latitude', 'Longitude'}
     df = df.drop(columns=columns_to_drop)
 
-    df = cp.categorize_victim_age(df)
+    df = crime_prep.categorize_victim_age(df)
 
     df[['VictimSex', 'VictimDescent', 'VictimAge']] = \
         df[['VictimSex', 'VictimDescent', 'VictimAge']].apply(LabelEncoder().fit_transform)
@@ -43,4 +44,4 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
 
         predicted_y.extend(list(clf.predict(test_x)))
 
-    cr.report(df, actual_y, predicted_y)
+    reporter.report(df, actual_y, predicted_y)

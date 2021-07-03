@@ -5,6 +5,45 @@ import crime_classification_utils as ccu
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
+new_crime_desc_codes = [('THEFT', 1), ('BURGLARY', 2), ('ASSAULT', 3), ('MINOR OFFENSE', 4), ('SEXUAL & CRIME REGARDING CHILD', 5)]
+
+crime_list = [['EMBEZZLEMENT, GRAND THEFT ($950.01 & OVER)', 'THEFT PLAIN - PETTY ($950 & UNDER)',
+               'SHOPLIFTING - PETTY THEFT ($950 & UNDER)',
+               'THEFT-GRAND ($950.01 & OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD0036',
+               'DEFRAUDING INNKEEPER/THEFT OF SERVICES, $400 & UNDER',
+               'SHOPLIFTING-GRAND THEFT ($950.01 & OVER)', 'THEFT, PERSON', 'THEFT PLAIN - ATTEMPT',
+               'THEFT FROM MOTOR VEHICLE - GRAND ($400 AND OVER)', 'THEFT OF IDENTITY', 'BUNCO, GRAND THEFT',
+               'THEFT FROM MOTOR VEHICLE - PETTY ($950 & UNDER)', 'BUNCO, PETTY THEFT',
+               'THEFT FROM MOTOR VEHICLE - ATTEMPT'],
+              ['BIKE - STOLEN', 'ROBBERY', 'BURGLARY', 'BURGLARY FROM VEHICLE', 'BURGLARY, ATTEMPTED',
+               'BURGLARY FROM VEHICLE, ATTEMPTED', 'ATTEMPTED ROBBERY', 'VEHICLE - ATTEMPT STOLEN',
+               'PURSE SNATCHING', 'CREDIT CARDS, FRAUD USE ($950.01 & OVER)'],
+              ['INTIMATE PARTNER - SIMPLE ASSAULT', 'ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT',
+               'BATTERY - SIMPLE ASSAULT', 'INTIMATE PARTNER - AGGRAVATED ASSAULT',
+               'BATTERY POLICE (SIMPLE)', 'DISCHARGE FIREARMS/SHOTS FIRED',
+               'SHOTS FIRED AT INHABITED DWELLING', 'BRANDISH WEAPON', 'EXTORTION', 'CRIMINAL HOMICIDE'],
+              ['STALKING', 'VANDALISM - MISDEAMEANOR ($399 OR UNDER)', 'TRESPASSING',
+               'RESISTING ARREST', 'CONTEMPT OF COURT', 'DOCUMENT FORGERY / STOLEN FELONY',
+               'VIOLATION OF TEMPORARY RESTRAINING ORDER', 'PROWLER', 'ARSON',
+               'UNAUTHORIZED COMPUTER ACCESS', 'VIOLATION OF COURT ORDER',
+               'VIOLATION OF RESTRAINING ORDER', 'FALSE IMPRISONMENT', 'CRUELTY TO ANIMALS',
+               'DISTURBING THE PEACE', 'THROWING OBJECT AT MOVING VEHICLE',
+               'CRIMINAL THREATS - NO WEAPON DISPLAYED',
+               'VANDALISM - FELONY ($400 & OVER, ALL CHURCH VANDALISMS) 0114',
+               'THREATENING PHONE CALLS/LETTERS', 'PICKPOCKET'],
+              ['SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH 0007=02',
+               'SEXUAL PENTRATION WITH A FOREIGN OBJECT',
+               'BATTERY WITH SEXUAL CONTACT',
+               'SEX, UNLAWFUL', 'RAPE, FORCIBLE', 'ORAL COPULATION',
+               'RAPE, ATTEMPTED',
+               'CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT',
+               'CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT', 'PEEPING TOM',
+               'LEWD CONDUCT',
+               'LETTERS, LEWD', 'INDECENT EXPOSURE',
+               'CHILD ANNOYING (17YRS & UNDER)',
+               'CHILD NEGLECT (SEE 300 W.I.C.)', 'CHILD STEALING', 'KIDNAPPING',
+               'CRM AGNST CHLD (13 OR UNDER) (14-15 & SUSP 10 YRS OLDER)0060']]
+
 
 # Below preprocessing steps are done once, then the filtered dataset is saved to use later
 def preprocess_and_save(original_file_name: str, preprocessed_file_name: str, interpolate: bool = True,
@@ -155,6 +194,7 @@ def categorize_victim_age(df: pd.DataFrame):
     childhood = childhood.append(old_age, ignore_index=True)
 
     return childhood
+
 
 # Print number of examples in each crime code
 def print_number_of_examples_in_crime_codes(df: pd.DataFrame):
@@ -311,3 +351,11 @@ def impute_victim_age_using_crime_codes(df: pd.DataFrame):
     df_new = imputer.fit_transform(df_new)
     print(df_new['Victim Age'].unique())
     print(df_new)
+
+
+def merge_crime_codes_and_save(df: pd.DataFrame, csv_name: str):
+    for i in range(len(new_crime_desc_codes)):
+        df.loc[(df['CrimeCodeDescription'].isin(crime_list[i])), 'CrimeCodeDescription'] = new_crime_desc_codes[i][0]
+        df.loc[(df['CrimeCodeDescription'] == new_crime_desc_codes[i][0]), 'CrimeCode'] = new_crime_desc_codes[i][1]
+    # Save
+    df.to_csv(csv_name, index=False)

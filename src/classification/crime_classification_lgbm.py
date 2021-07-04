@@ -16,10 +16,10 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
 
     df = crime_prep.categorize_victim_age(df)
 
-    if mode == conf.CLASSIFY_WITH_LGBM_MODE_LABEL_ENCODING:
+    if mode == conf.LABEL_ENCODING:
         df[['VictimSex', 'VictimDescent', 'VictimAge']] = df[['VictimSex', 'VictimDescent', 'VictimAge']].apply(
             LabelEncoder().fit_transform)
-    elif mode == conf.CLASSIFY_WITH_LGBM_MODE_OHE:
+    elif mode == conf.ONE_HOT_ENCODING:
         df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAgeStage', 'VictimSex', 'VictimDescent', 'SeasonOccurred',
                                 'DayOfWeek'])
 

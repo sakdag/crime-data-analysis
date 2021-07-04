@@ -78,15 +78,18 @@ if __name__ == "__main__":
 
         categorical_nb.classify_and_report(crime_df, number_of_folds)
 
-    elif mode == conf.CLASSIFY_WITH_LGBM_MODE_OHE or mode == conf.CLASSIFY_WITH_LGBM_MODE_LABEL_ENCODING:
+    elif mode == conf.CLASSIFY_WITH_LGBM_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
         number_of_folds = 3
+        categorical_column_handling_method = 'label_encoding'
 
         for i in range(2, len(sys.argv)):
             if sys.argv[i].split('=')[0] == 'number_of_folds':
                 number_of_folds = int(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'categorical_column_handling_method':
+                categorical_column_handling_method = int(sys.argv[i].split('=')[1])
 
-        lgbm.classify_and_report(crime_df, number_of_folds, mode)
+        lgbm.classify_and_report(crime_df, number_of_folds, categorical_column_handling_method)
 
     elif mode == conf.VISUALIZE_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
@@ -114,3 +117,5 @@ if __name__ == "__main__":
                     y_label = input("Please choose the y label name: ")
                     visualizer.construct_line_chart(crime_df, column_name, x_label, y_label, title)
                     break
+            if txt == 'q':
+                break

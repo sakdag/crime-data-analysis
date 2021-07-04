@@ -61,10 +61,11 @@ def add_zip_code_column_using_euclidean(crime_df: pd.DataFrame, census_df: pd.Da
         crime_df.loc[index, col_names.ZIP_CODE] = nearest_zip_code
 
 
-def merge_crime_and_census(crime_df: pd.DataFrame, census_df: pd.DataFrame) -> pd.DataFrame:
+def merge_crime_and_census(crime_df: pd.DataFrame, census_df: pd.DataFrame, file_name: str):
     merged_df = crime_df.merge(census_df, on=col_names.ZIP_CODE, how='inner')
-    redundant_columns = ['Latitude_x', 'Latitude_y', 'Longitude_x', 'Longitude_y', col_names.ZIP_CODE,
+    redundant_columns = ['Latitude_x', 'Latitude_y', 'Longitude_x', 'Longitude_y',
                          col_names.TOTAL_HOUSEHOLDS, col_names.AVERAGE_HOUSEHOLD_SIZE]
-    for column_name in redundant_columns:
-        del merged_df[column_name]
-    return merged_df
+    merged_df.drop(columns=redundant_columns, inplace=True)
+
+    # Save
+    merged_df.to_csv(file_name, index=False)

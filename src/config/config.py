@@ -5,6 +5,7 @@ CORRELATE_CRIME_DATASET_MODE = 'correlate'
 CLASSIFY_WITH_CATEGORICAL_NB_MODE = 'classify_cnb'
 CLASSIFY_WITH_LGBM_MODE = 'classify_lgbm'
 VISUALIZE_MODE = 'visualize'
+MERGE_DATASETS_MODE = 'merge_datasets'
 
 # Categorical column handling modes:
 ONE_HOT_ENCODING = 'one_hot_encoding'

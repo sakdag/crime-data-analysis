@@ -7,6 +7,8 @@ VICTIM_DESCENT = 'VictimDescent'
 PREMISE_CODE = 'PremiseCode'
 VICTIM_AGE = 'VictimAge'
 CRIME_CODE_DESCRIPTION = 'CrimeCodeDescription'
+DR_NUMBER = 'DRNumber'
+PREMISE_DESCRIPTION = 'PremiseDescription'
 
 # Created crime dataset column names
 LATITUDE = 'Latitude'

@@ -68,15 +68,24 @@ if __name__ == "__main__":
                                        correlated_crime_dataset_file_path,
                                        correlation_mode)
 
+    elif mode == conf.MERGE_DATASETS_MODE:
+        crime_df = utils.read_dataset(correlated_crime_dataset_file_path)
+        census_df = utils.read_dataset(preprocessed_census_dataset_file_path)
+
+        correlation.merge_crime_and_census(crime_df, census_df, preprocessed_crime_dataset_file_path)
+
     elif mode == conf.CLASSIFY_WITH_CATEGORICAL_NB_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
         number_of_folds = 3
+        use_census = False
 
         for i in range(2, len(sys.argv)):
             if sys.argv[i].split('=')[0] == 'number_of_folds':
                 number_of_folds = int(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'use_census':
+                use_census = (sys.argv[i].split('=')[1] == 'true')
 
-        categorical_nb.classify_and_report(crime_df, number_of_folds)
+        categorical_nb.classify_and_report(crime_df, number_of_folds, use_census)
 
     elif mode == conf.CLASSIFY_WITH_LGBM_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)

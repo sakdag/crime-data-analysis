@@ -32,3 +32,99 @@ def insert_geolocation_info(df: pd.DataFrame, zip_codes_df: pd.DataFrame):
                 df.loc[census_index, col_names.LATITUDE] = zip_row['lat']
                 df.loc[census_index, col_names.LONGITUDE] = zip_row['lng']
                 break
+
+
+def categorize_total_population(df):
+    low = df.loc[df[col_names.TOTAL_POPULATION] <= 20000]
+    low.loc[low[col_names.TOTAL_POPULATION] <= 20000, col_names.TOTAL_POPULATION] = 'Low'
+
+    medium = df.loc[np.logical_and(df[col_names.TOTAL_POPULATION] > 20000,
+                                   df[col_names.TOTAL_POPULATION] <= 40000)]
+    medium.loc[
+        np.logical_and(medium[col_names.TOTAL_POPULATION] > 20000,
+                       medium[col_names.TOTAL_POPULATION] <= 40000),
+        col_names.TOTAL_POPULATION] = 'Medium'
+
+    high = df.loc[np.logical_and(df[col_names.TOTAL_POPULATION] > 40000,
+                                 df[col_names.TOTAL_POPULATION] <= 60000)]
+    high.loc[np.logical_and(high[col_names.TOTAL_POPULATION] > 40000,
+                            high[col_names.TOTAL_POPULATION] <= 60000),
+              col_names.TOTAL_POPULATION] = 'High'
+
+    extreme = df.loc[df[col_names.TOTAL_POPULATION] > 60000]
+    extreme.loc[extreme[col_names.TOTAL_POPULATION] > 60000, col_names.TOTAL_POPULATION] = 'Extreme'
+
+    low = low.append(medium, ignore_index=True)
+    low = low.append(high, ignore_index=True)
+    low = low.append(extreme, ignore_index=True)
+
+    low = low.rename({col_names.TOTAL_POPULATION: col_names.TOTAL_POPULATION_CATEGORIZED}, axis=1)
+
+    return low
+
+
+def categorize_total_males_and_females(df):
+    df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = np.nan
+    for index, row in df.iterrows():
+        total_males = row[col_names.TOTAL_MALES]
+        total_females = row[col_names.TOTAL_FEMALES]
+
+        female_to_male_ratio = float(total_females + 1) / float(total_males + 1) * 100
+        df.loc[index, col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = female_to_male_ratio
+
+    low = df.loc[df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 48.0]
+    low.loc[low[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 48.0,
+            col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'Low'
+
+    almost_equal = df.loc[np.logical_and(df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 48.0,
+                                   df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 52.0)]
+    almost_equal.loc[
+        np.logical_and(almost_equal[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 48.0,
+                       almost_equal[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 52.0),
+        col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'AlmostEqual'
+
+    high = df.loc[df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 52.0]
+    high.loc[high[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 52.0,
+             col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'High'
+
+    low = low.append(almost_equal, ignore_index=True)
+    low = low.append(high, ignore_index=True)
+
+    return low
+
+
+def categorize_median_age(df):
+    low = df.loc[df[col_names.MEDIAN_AGE] <= 30.0]
+    low.loc[low[col_names.MEDIAN_AGE] <= 30.0, col_names.MEDIAN_AGE] = 'Low'
+
+    low_to_medium = df.loc[np.logical_and(df[col_names.MEDIAN_AGE] > 30.0,
+                                          df[col_names.MEDIAN_AGE] <= 35.0)]
+    low_to_medium.loc[
+        np.logical_and(low_to_medium[col_names.MEDIAN_AGE] > 30.0,
+                       low_to_medium[col_names.MEDIAN_AGE] <= 35.0),
+        col_names.MEDIAN_AGE] = 'LowToMedium'
+
+    medium = df.loc[np.logical_and(df[col_names.MEDIAN_AGE] > 35.0,
+                                   df[col_names.MEDIAN_AGE] <= 40.0)]
+    medium.loc[
+        np.logical_and(medium[col_names.MEDIAN_AGE] > 35.0,
+                       medium[col_names.MEDIAN_AGE] <= 40.0),
+        col_names.MEDIAN_AGE] = 'Medium'
+
+    medium_to_high = df.loc[np.logical_and(df[col_names.MEDIAN_AGE] > 40.0,
+                                           df[col_names.MEDIAN_AGE] <= 45.0)]
+    medium_to_high.loc[np.logical_and(medium_to_high[col_names.MEDIAN_AGE] > 40.0,
+                                      medium_to_high[col_names.MEDIAN_AGE] <= 45.0),
+             col_names.MEDIAN_AGE] = 'MediumToHigh'
+
+    high = df.loc[df[col_names.MEDIAN_AGE] > 45.0]
+    high.loc[high[col_names.MEDIAN_AGE] > 45.0, col_names.MEDIAN_AGE] = 'High'
+
+    low = low.append(low_to_medium, ignore_index=True)
+    low = low.append(medium, ignore_index=True)
+    low = low.append(medium_to_high, ignore_index=True)
+    low = low.append(high, ignore_index=True)
+
+    low = low.rename({col_names.MEDIAN_AGE: col_names.MEDIAN_AGE_CATEGORIZED}, axis=1)
+
+    return low

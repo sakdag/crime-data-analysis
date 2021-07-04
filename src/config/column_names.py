@@ -36,3 +36,8 @@ TOTAL_MALES = 'TotalMales'
 TOTAL_FEMALES = 'TotalFemales'
 TOTAL_HOUSEHOLDS = 'TotalHouseholds'
 AVERAGE_HOUSEHOLD_SIZE = 'AverageHouseholdSize'
+
+# Created crime dataset column names
+TOTAL_POPULATION_CATEGORIZED = 'TotalPopulationCategory'
+MALE_TO_FEMALE_RATIO_CATEGORIZED = 'MaleToFemaleRatioCategory'
+MEDIAN_AGE_CATEGORIZED = 'MedianAgeCategory'

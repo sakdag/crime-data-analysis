@@ -79,7 +79,7 @@ if __name__ == "__main__":
         number_of_folds = 3
         use_census = False
         number_of_labels = conf.USE_72_LABELS
-        sample_size = -1
+        undersample = False
 
         for i in range(2, len(sys.argv)):
             if sys.argv[i].split('=')[0] == 'number_of_folds':
@@ -88,10 +88,10 @@ if __name__ == "__main__":
                 use_census = (sys.argv[i].split('=')[1] == 'true')
             if sys.argv[i].split('=')[0] == 'number_of_labels':
                 number_of_labels = sys.argv[i].split('=')[1]
-            if sys.argv[i].split('=')[0] == 'sample_size':
-                sample_size = int(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'undersample':
+                undersample = (sys.argv[i].split('=')[1] == 'true')
 
-        categorical_nb.classify_and_report(crime_df, number_of_folds, number_of_labels, use_census, sample_size)
+        categorical_nb.classify_and_report(crime_df, number_of_folds, number_of_labels, use_census, undersample)
 
     elif mode == conf.CLASSIFY_WITH_LGBM_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)

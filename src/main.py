@@ -96,7 +96,7 @@ if __name__ == "__main__":
             if sys.argv[i].split('=')[0] == 'number_of_folds':
                 number_of_folds = int(sys.argv[i].split('=')[1])
             if sys.argv[i].split('=')[0] == 'categorical_column_handling_method':
-                categorical_column_handling_method = int(sys.argv[i].split('=')[1])
+                categorical_column_handling_method = str(sys.argv[i].split('=')[1])
 
         lgbm.classify_and_report(crime_df, number_of_folds, categorical_column_handling_method)
 

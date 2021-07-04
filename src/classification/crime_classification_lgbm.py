@@ -14,14 +14,13 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
                        'PremiseDescription', 'Latitude', 'Longitude'}
     df = df.drop(columns=columns_to_drop)
 
-    df = crime_prep.categorize_victim_age(df)
-
     if mode == conf.LABEL_ENCODING:
+        df = crime_prep.categorize_victim_age(df)
         df[['VictimSex', 'VictimDescent', 'VictimAge']] = df[['VictimSex', 'VictimDescent', 'VictimAge']].apply(
             LabelEncoder().fit_transform)
     elif mode == conf.ONE_HOT_ENCODING:
-        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAgeStage', 'VictimSex', 'VictimDescent', 'SeasonOccurred',
-                                'DayOfWeek'])
+        df = crime_prep.preprocess_and_save_before_ohe(df)
+        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'MonthOccurred', 'DayOfWeek'])
 
     label = 'CrimeCode'
     df = df.sample(frac=1).reset_index(drop=True)
@@ -51,11 +50,6 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
         predicted_y.extend(list(clf.predict(test_x)))
 
     reporter.report(df, actual_y, predicted_y)
-
-    confusion_matrix_answer = input("Do you want to generate the confusion matrix? (yes/no): ")
-
-    if confusion_matrix_answer == 'yes':
-        visualizer.plot_confusion_matrix(df, actual_y, predicted_y)
 
 
 def obtain_ohe_df(df, column_names):

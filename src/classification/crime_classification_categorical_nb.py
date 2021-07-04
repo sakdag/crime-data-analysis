@@ -60,9 +60,3 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int, use_census: bool
         predicted_y.extend(list(clf.predict(test_x)))
 
     reporter.report(df, actual_y, predicted_y)
-
-    confusion_matrix_answer = input("Do you want to generate the confusion matrix? (yes/no): ")
-
-    if confusion_matrix_answer == 'yes':
-        visualizer.plot_confusion_matrix(df, actual_y, predicted_y)
-

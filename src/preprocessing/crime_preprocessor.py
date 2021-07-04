@@ -76,8 +76,7 @@ def preprocess_and_save(original_file_name: str,
     df.to_csv(preprocessed_file_name, index=False)
 
 
-def preprocess_and_save_before_ohe(original_file_name: str, preprocessed_file_name: str):
-    df = ccu.read_dataset(original_file_name)
+def preprocess_and_save_before_ohe(df: pd.DataFrame):
 
     df = categorize_victim_age(df)
 
@@ -124,11 +123,7 @@ def preprocess_and_save_before_ohe(original_file_name: str, preprocessed_file_na
 
     df = winter
 
-    df = df.rename(columns={col_names.VICTIM_AGE: col_names.VICTIM_AGE_STAGE,
-                            col_names.MONTH_OCCURRED: col_names.SEASON_OCCURRED})
-
-    # Save
-    df.to_csv(preprocessed_file_name, index=False)
+    return df
 
 
 def categorize_victim_age(df: pd.DataFrame):

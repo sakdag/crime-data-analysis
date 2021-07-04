@@ -44,3 +44,9 @@ CRIME_LIST = [
      'CHILD NEGLECT (SEE 300 W.I.C.)', 'CHILD STEALING', 'KIDNAPPING',
      'CRM AGNST CHLD (13 OR UNDER) (14-15 & SUSP 10 YRS OLDER)0060']
 ]
+
+VISUALIZATION_INPUTS = [
+    ['pie', 'line', 'confusion', 'q'],
+    ['DRNumber', 'TimeOccurred', 'CrimeCode', 'CrimeCodeDescription', 'VictimAge', 'VictimSex', 'VictimDescent',
+     'PremiseCode', 'PremiseDescription', 'MonthOccurred', 'DayOfWeek']
+]

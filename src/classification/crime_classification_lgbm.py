@@ -1,63 +1,61 @@
-import math
+import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier
+from sklearn.preprocessing import LabelEncoder
+
+import src.config.config as conf
+import src.preprocessing.crime_preprocessor as crime_prep
+import src.utils.classification_reporter as reporter
+import src.utils.visualization as visualizer
 
 
-def construct_model_with_decision_tree(df):
-    X, y = get_x_y_columns(df)
-    dt = LGBMClassifier()
-    dt.fit(X, y.values.ravel())
-    return dt
+def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
+    columns_to_drop = {'DRNumber', 'CrimeCodeDescription',
+                       'PremiseDescription', 'Latitude', 'Longitude'}
+    df = df.drop(columns=columns_to_drop)
 
+    df = crime_prep.categorize_victim_age(df)
 
-def get_x_y_columns(df):
-    drop_columns = ['DRNumber', 'CrimeCode', 'CrimeCodeDescription', 'PremiseDescription', 'Latitude', 'Longitude']
-    y_column = ['CrimeCode']
+    if mode == conf.CLASSIFY_WITH_LGBM_MODE_LABEL_ENCODING:
+        df[['VictimSex', 'VictimDescent', 'VictimAge']] = df[['VictimSex', 'VictimDescent', 'VictimAge']].apply(
+            LabelEncoder().fit_transform)
+    elif mode == conf.CLASSIFY_WITH_LGBM_MODE_OHE:
+        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAgeStage', 'VictimSex', 'VictimDescent', 'SeasonOccurred',
+                                'DayOfWeek'])
 
-    X = df.drop(drop_columns, axis=1)
-    y = df[y_column]
+    label = 'CrimeCode'
+    df = df.sample(frac=1).reset_index(drop=True)
+    split_dfs = np.array_split(df, number_of_folds)
 
-    return X, y
+    clf = LGBMClassifier()
+    actual_y = list()
+    predicted_y = list()
 
+    for i in range(number_of_folds):
+        # Get training set by appending elements other than current fold
+        train_set = pd.DataFrame()
+        for j in range(number_of_folds):
+            if j != i:
+                train_set = train_set.append(split_dfs[j])
 
-def predict_value(dt, test_data):
-    X, y = get_x_y_columns(test_data)
-    forecast_labels = list(dt.predict(X))
-    return forecast_labels, y
+        test_set = split_dfs[i]
 
+        y = train_set[[label]]
+        x = train_set.drop([label], axis=1)
 
-def get_experiments(df):
-    df = df.sample(frac=1)
-    data_size = len(df)
-    groups = [df.iloc[:math.ceil(data_size / 3)], df.iloc[math.ceil(data_size / 3):math.ceil((2 * data_size) / 3)],
-              df.iloc[math.ceil((2 * data_size) / 3):]]
-    experiments = [get_train_test_data(groups[0], groups[1], groups[2]),
-                   get_train_test_data(groups[0], groups[2], groups[1]),
-                   get_train_test_data(groups[1], groups[2], groups[0])]
+        clf.fit(x, y.values.ravel())
 
-    return experiments
+        actual_y.extend(test_set[label].to_list())
+        test_x = test_set.drop([label], axis=1)
 
+        predicted_y.extend(list(clf.predict(test_x)))
 
-def get_train_test_data(train1, train2, test):
-    train_data = pd.concat([train1, train2])
-    train_data = train_data.reset_index(drop=True)
-    test_data = test
-    test_data = test_data.reset_index(drop=True)
-    return train_data, test_data
+    reporter.report(df, actual_y, predicted_y)
 
+    confusion_matrix_answer = input("Do you want to generate the confusion matrix? (yes/no): ")
 
-def calculate_error(y_tuple):
-    return calculate_true_label_ratio(y_tuple[1], y_tuple[0])
-
-
-def print_error(exp1_error, exp2_error, exp3_error):
-    print('Ratio: ' + str(100 * (exp1_error + exp2_error + exp3_error) / 3) + '%')
-
-
-# Accuracy
-def calculate_true_label_ratio(y, forecast):
-    y_size = len(y)
-    return sum((1 if a == b else 0) for a, b in zip(y['CrimeCode'], forecast)) / y_size
+    if confusion_matrix_answer == 'yes':
+        visualizer.plot_confusion_matrix(df, actual_y, predicted_y)
 
 
 def obtain_ohe_df(df, column_names):

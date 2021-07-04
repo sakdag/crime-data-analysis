@@ -2,11 +2,13 @@ import os
 import sys
 
 import src.config.config as conf
+import src.config.crime_code_constants as constants
 import src.preprocessing.crime_preprocessor as crime_prep
 import src.preprocessing.census_preprocessor as census_prep
 import src.utils.crime_classification_utils as utils
 import src.correlation.dataset_correlation as correlation
 import src.classification.crime_classification_categorical_nb as categorical_nb
+import src.classification.crime_classification_lgbm as lgbm
 import src.utils.visualization as visualizer
 
 if __name__ == "__main__":
@@ -76,46 +78,39 @@ if __name__ == "__main__":
 
         categorical_nb.classify_and_report(crime_df, number_of_folds)
 
-    elif mode == conf.CLASSIFY_WITH_LGBM_MODE:
-        pass
+    elif mode == conf.CLASSIFY_WITH_LGBM_MODE_OHE or mode == conf.CLASSIFY_WITH_LGBM_MODE_LABEL_ENCODING:
+        crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
+        number_of_folds = 3
+
+        for i in range(2, len(sys.argv)):
+            if sys.argv[i].split('=')[0] == 'number_of_folds':
+                number_of_folds = int(sys.argv[i].split('=')[1])
+
+        lgbm.classify_and_report(crime_df, number_of_folds, mode)
 
     elif mode == conf.VISUALIZE_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
-
-        visualizer.construct_line_chart(crime_df, 'hey', 'hey', 'hey', 'hey')
-        visualizer.construct_pie_chart(crime_df, 'hey')
-
-    ####################################################################################################################
-    # for the solution with one hot encoding, please read the dataset named preprocessed_crime_dataset_file_name_ohe
-    # column_names = ['TimeOccurred', 'VictimAgeStage', 'VictimSex', 'VictimDescent', 'SeasonOccurred', 'DayOfWeek']
-    # df = cc.obtain_ohe_df(df, column_names)
-
-    # # for the solution with label encoder, please read the dataset named preprocessed_crime_dataset_file_name
-    # df[['VictimSex', 'VictimDescent']] = df[['VictimSex', 'VictimDescent']].apply(LabelEncoder().fit_transform)
-    #
-    # # common part for both label encoding and one hot encoding
-    # experiments = cc.get_experiments(df)
-    #
-    # actual_y = list()
-    # predicted_y = list()
-    # predicted_y_temp, actual_y_temp = \
-    #     cc.predict_value(cc.construct_model_with_decision_tree(experiments[0][0]), experiments[0][1])
-    # actual_y.extend(actual_y_temp['CrimeCode'].to_list())
-    # predicted_y.extend(predicted_y_temp)
-    # predicted_y_temp, actual_y_temp = \
-    #     cc.predict_value(cc.construct_model_with_decision_tree(experiments[1][0]), experiments[1][1])
-    # actual_y.extend(actual_y_temp['CrimeCode'].to_list())
-    # predicted_y.extend(predicted_y_temp)
-    # predicted_y_temp, actual_y_temp = \
-    #     cc.predict_value(cc.construct_model_with_decision_tree(experiments[2][0]), experiments[2][1])
-    # actual_y.extend(actual_y_temp['CrimeCode'].to_list())
-    # predicted_y.extend(predicted_y_temp)
-    # cr.report(df, actual_y, predicted_y)
-
-    # cc.print_error(cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[0][0]), experiments[0][1])),
-    #                cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[1][0]), experiments[1][1])),
-    #                cc.calculate_error(cc.predict_value(cc.construct_model_with_decision_tree(experiments[2][0]), experiments[2][1])))
-    ####################################################################################################################
-
-    # What to do with these
-    # ccu.print_unique_category_counts(df, 'CrimeCode')
+        while True:
+            txt = input("Please choose the type of visualizer (pie, line) or q to quit: ")
+            if txt not in constants.VISUALIZATION_INPUTS[0]:
+                print('Invalid Visualizer!')
+                continue
+            if txt == 'pie':
+                while True:
+                    column_name = input("Please choose the column name: ")
+                    if column_name not in constants.VISUALIZATION_INPUTS[1]:
+                        print('Invalid Column!')
+                        continue
+                    visualizer.construct_pie_chart(crime_df, column_name)
+                    break
+            if txt == 'line':
+                while True:
+                    column_name = input("Please choose the column name: ")
+                    if column_name not in constants.VISUALIZATION_INPUTS[1]:
+                        print('Invalid Column!')
+                        continue
+                    title = input("Please choose the title name: ")
+                    x_label = input("Please choose the x label name: ")
+                    y_label = input("Please choose the y label name: ")
+                    visualizer.construct_line_chart(crime_df, column_name, x_label, y_label, title)
+                    break

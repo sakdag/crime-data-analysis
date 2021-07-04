@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 
 import src.utils.classification_reporter as reporter
 import src.preprocessing.crime_preprocessor as crime_prep
+import src.utils.visualization as visualizer
 
 
 def classify_and_report(df: pd.DataFrame, number_of_folds: int):
@@ -45,3 +46,9 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int):
         predicted_y.extend(list(clf.predict(test_x)))
 
     reporter.report(df, actual_y, predicted_y)
+
+    confusion_matrix_answer = input("Do you want to generate the confusion matrix? (yes/no): ")
+
+    if confusion_matrix_answer == 'yes':
+        visualizer.plot_confusion_matrix(df, actual_y, predicted_y)
+

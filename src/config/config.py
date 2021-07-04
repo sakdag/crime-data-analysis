@@ -3,7 +3,8 @@ PREPROCESS_CRIME_DATASET_MODE = 'preprocess_crime'
 PREPROCESS_CENSUS_DATASET_MODE = 'preprocess_census'
 CORRELATE_CRIME_DATASET_MODE = 'correlate'
 CLASSIFY_WITH_CATEGORICAL_NB_MODE = 'classify_cnb'
-CLASSIFY_WITH_LGBM_MODE = 'classify_lgbm'
+CLASSIFY_WITH_LGBM_MODE_OHE = 'classify_lgbm_label_enc'
+CLASSIFY_WITH_LGBM_MODE_LABEL_ENCODING = 'classify_lgbm_ohe'
 VISUALIZE_MODE = 'visualize'
 
 # Original file paths

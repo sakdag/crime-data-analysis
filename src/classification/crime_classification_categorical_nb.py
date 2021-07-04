@@ -5,7 +5,6 @@ from sklearn.preprocessing import LabelEncoder
 
 import src.utils.classification_reporter as reporter
 import src.preprocessing.crime_preprocessor as crime_prep
-import src.utils.visualization as visualizer
 import src.config.column_names as col_names
 
 

@@ -229,13 +229,13 @@ def get_nan_valid_tuple(df: pd.DataFrame, column_name: str):
 
 
 # Split crimes by their times to 8 categories (3-hour frames)
-def categorize_time_occurred(df: pd.DataFrame):
+def categorize_time_occurred(df: pd.DataFrame) -> None:
     df[col_names.TIME_OCCURRED] = df[col_names.TIME_OCCURRED].floordiv(300)
     df[col_names.TIME_OCCURRED] = pd.to_numeric(df[col_names.TIME_OCCURRED])
 
 
 # Create new column for month of the crime as categorical data from 0:Jan to 11:Dec
-def create_month_occurred_column(df: pd.DataFrame):
+def create_month_occurred_column(df: pd.DataFrame) -> None:
     df[col_names.DATE_OCCURRED] = pd.to_datetime(df[col_names.DATE_OCCURRED], format='%m/%d/%Y')
     df[col_names.MONTH_OCCURRED] = df[col_names.DATE_OCCURRED].dt.month
     df[col_names.MONTH_OCCURRED] = pd.to_numeric(df[col_names.MONTH_OCCURRED])
@@ -243,13 +243,13 @@ def create_month_occurred_column(df: pd.DataFrame):
 
 
 # Create new column which describes which day of week the crime occurred, 0:Mon to 6:Sun
-def create_day_of_week_column(df: pd.DataFrame):
+def create_day_of_week_column(df: pd.DataFrame) -> None:
     df[col_names.DAY_OF_WEEK] = df[col_names.DATE_OCCURRED].dt.dayofweek
     df[col_names.DAY_OF_WEEK] = pd.to_numeric(df[col_names.DAY_OF_WEEK])
 
 
 # Extract Lat-Long information from Location column and create columns for them to use later
-def create_geolocation_columns(df: pd.DataFrame):
+def create_geolocation_columns(df: pd.DataFrame) -> None:
     df[col_names.LOCATION].replace(np.NaN, '(0,0)')
     df[[col_names.LATITUDE, col_names.LONGITUDE]] = df[col_names.LOCATION].str.split(',', expand=True)
     df[col_names.LATITUDE] = df[col_names.LATITUDE].str[1:]
@@ -258,7 +258,7 @@ def create_geolocation_columns(df: pd.DataFrame):
     df[col_names.LATITUDE] = pd.to_numeric(df[col_names.LATITUDE])
 
 
-def impute_victim_age_using_crime_codes(df: pd.DataFrame):
+def impute_victim_age_using_crime_codes(df: pd.DataFrame) -> None:
     df_new = df[[col_names.CRIME_CODE, col_names.VICTIM_AGE]]
 
     label_encoder = LabelEncoder()
@@ -276,7 +276,7 @@ def impute_victim_age_using_crime_codes(df: pd.DataFrame):
     print(df_new)
 
 
-def merge_crime_codes_and_save(df: pd.DataFrame, csv_name: str):
+def merge_crime_codes_and_save(df: pd.DataFrame) -> pd.DataFrame:
     for i in range(len(crime_const.MERGED_CRIME_DESC_CODES)):
         df.loc[
             (df[col_names.CRIME_CODE_DESCRIPTION].isin(crime_const.CRIME_LIST[i])), col_names.CRIME_CODE_DESCRIPTION] = \
@@ -285,5 +285,4 @@ def merge_crime_codes_and_save(df: pd.DataFrame, csv_name: str):
             (df[col_names.CRIME_CODE_DESCRIPTION] == crime_const.MERGED_CRIME_DESC_CODES[i][0]), col_names.CRIME_CODE] = \
             crime_const.MERGED_CRIME_DESC_CODES[i][1]
 
-    # Save
-    df.to_csv(csv_name, index=False)
+    return df

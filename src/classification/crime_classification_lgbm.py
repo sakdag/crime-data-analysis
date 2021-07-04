@@ -6,10 +6,9 @@ from sklearn.preprocessing import LabelEncoder
 import src.config.config as conf
 import src.preprocessing.crime_preprocessor as crime_prep
 import src.utils.classification_reporter as reporter
-import src.utils.visualization as visualizer
+import src.config.column_names as col_names
 
-
-def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
+def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str, use_census: bool = False):
     columns_to_drop = {'DRNumber', 'CrimeCodeDescription',
                        'PremiseDescription', 'Latitude', 'Longitude'}
     df = df.drop(columns=columns_to_drop)
@@ -21,6 +20,17 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str):
     elif mode == conf.ONE_HOT_ENCODING:
         df = crime_prep.preprocess_and_save_before_ohe(df)
         df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'MonthOccurred', 'DayOfWeek'])
+
+    if use_census:
+        pass
+    else:
+        df.drop(columns=[
+            col_names.ZIP_CODE,
+            col_names.TOTAL_POPULATION,
+            col_names.TOTAL_MALES,
+            col_names.TOTAL_FEMALES,
+            col_names.MEDIAN_AGE
+        ], inplace=True)
 
     label = 'CrimeCode'
     df = df.sample(frac=1).reset_index(drop=True)

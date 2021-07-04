@@ -6,9 +6,21 @@ from sklearn.preprocessing import LabelEncoder
 import src.utils.classification_reporter as reporter
 import src.preprocessing.crime_preprocessor as crime_prep
 import src.config.column_names as col_names
+import src.config.config as conf
 
 
-def classify_and_report(df: pd.DataFrame, number_of_folds: int, use_census: bool = False):
+def classify_and_report(df: pd.DataFrame, number_of_folds: int,
+                        number_of_labels: str = conf.USE_72_LABELS, use_census: bool = False,
+                        sample_size: int = -1):
+
+    if number_of_labels == conf.USE_11_LABELS:
+        df = df.groupby(col_names.CRIME_CODE).filter(lambda x: len(x) > 50000)
+    elif number_of_labels == conf.USE_5_LABELS:
+        df = crime_prep.merge_crime_codes(df)
+
+    if sample_size != -1:
+        pass
+
     columns_to_drop = {col_names.DR_NUMBER, col_names.CRIME_CODE_DESCRIPTION,
                        col_names.PREMISE_DESCRIPTION}
     df = df.drop(columns=columns_to_drop)

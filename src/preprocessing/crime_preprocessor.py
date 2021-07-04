@@ -276,7 +276,7 @@ def impute_victim_age_using_crime_codes(df: pd.DataFrame) -> None:
     print(df_new)
 
 
-def merge_crime_codes_and_save(df: pd.DataFrame) -> pd.DataFrame:
+def merge_crime_codes(df: pd.DataFrame) -> pd.DataFrame:
     for i in range(len(crime_const.MERGED_CRIME_DESC_CODES)):
         df.loc[
             (df[col_names.CRIME_CODE_DESCRIPTION].isin(crime_const.CRIME_LIST[i])), col_names.CRIME_CODE_DESCRIPTION] = \

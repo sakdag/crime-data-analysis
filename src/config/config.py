@@ -7,6 +7,11 @@ CLASSIFY_WITH_LGBM_MODE = 'classify_lgbm'
 VISUALIZE_MODE = 'visualize'
 MERGE_DATASETS_MODE = 'merge_datasets'
 
+# Dataset modes
+USE_72_LABELS = '72_labels'
+USE_11_LABELS = '11_labels'
+USE_5_LABELS = '5_labels'
+
 # Categorical column handling modes:
 ONE_HOT_ENCODING = 'one_hot_encoding'
 LABEL_ENCODING = 'label_encoding'

@@ -64,28 +64,28 @@ def categorize_total_population(df):
 
 
 def categorize_total_males_and_females(df):
-    df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = np.nan
+    df[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] = np.nan
     for index, row in df.iterrows():
         total_males = row[col_names.TOTAL_MALES]
         total_females = row[col_names.TOTAL_FEMALES]
 
         female_to_male_ratio = float(total_females + 1) / float(total_males + 1) * 100
-        df.loc[index, col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = female_to_male_ratio
+        df.loc[index, col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] = female_to_male_ratio
 
-    low = df.loc[df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 48.0]
-    low.loc[low[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 48.0,
-            col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'Low'
+    low = df.loc[df[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] <= 48.0]
+    low.loc[low[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] <= 48.0,
+            col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] = 'Low'
 
-    almost_equal = df.loc[np.logical_and(df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 48.0,
-                                   df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 52.0)]
+    almost_equal = df.loc[np.logical_and(df[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] > 48.0,
+                                   df[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] <= 52.0)]
     almost_equal.loc[
-        np.logical_and(almost_equal[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 48.0,
-                       almost_equal[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] <= 52.0),
-        col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'AlmostEqual'
+        np.logical_and(almost_equal[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] > 48.0,
+                       almost_equal[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] <= 52.0),
+        col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] = 'AlmostEqual'
 
-    high = df.loc[df[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 52.0]
-    high.loc[high[col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] > 52.0,
-             col_names.MALE_TO_FEMALE_RATIO_CATEGORIZED] = 'High'
+    high = df.loc[df[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] > 52.0]
+    high.loc[high[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] > 52.0,
+             col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED] = 'High'
 
     low = low.append(almost_equal, ignore_index=True)
     low = low.append(high, ignore_index=True)

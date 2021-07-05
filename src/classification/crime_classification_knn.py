@@ -1,17 +1,16 @@
 import numpy as np
 import pandas as pd
-from sklearn.naive_bayes import CategoricalNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 
-import src.utils.classification_reporter as reporter
-import src.preprocessing.crime_preprocessor as crime_prep
-import src.preprocessing.census_preprocessor as census_prep
-import src.config.column_names as col_names
 import src.config.config as conf
+import src.preprocessing.crime_preprocessor as crime_prep
+import src.utils.classification_reporter as reporter
+import src.config.column_names as col_names
 
 
-def classify_and_report(df: pd.DataFrame, number_of_folds: int,
-                        number_of_labels: str = conf.USE_72_LABELS, use_census: bool = False,
+def classify_and_report(df: pd.DataFrame, number_of_neighbors: int, number_of_folds: int,
+                        mode: str, number_of_labels: str = conf.USE_72_LABELS, use_census: bool = False,
                         undersample: bool = True):
 
     if number_of_labels == conf.USE_11_LABELS:
@@ -35,49 +34,32 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int,
                        col_names.PREMISE_DESCRIPTION}
     df = df.drop(columns=columns_to_drop)
 
-    df = crime_prep.categorize_victim_age(df)
+    if mode == conf.LABEL_ENCODING:
+        df[[col_names.VICTIM_SEX, col_names.VICTIM_DESCENT, col_names.PREMISE_CODE]] = \
+            df[[col_names.VICTIM_SEX,
+                col_names.VICTIM_DESCENT,
+                col_names.PREMISE_CODE]].apply(LabelEncoder().fit_transform)
+    elif mode == conf.ONE_HOT_ENCODING:
+        df = crime_prep.preprocess_and_save_before_ohe(df)
+        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimSex', 'VictimDescent', 'MonthOccurred', 'DayOfWeek'])
 
-    df[[col_names.VICTIM_SEX, col_names.VICTIM_DESCENT, col_names.VICTIM_AGE, col_names.PREMISE_CODE]] = \
-        df[[col_names.VICTIM_SEX,
-            col_names.VICTIM_DESCENT,
-            col_names.VICTIM_AGE,
-            col_names.PREMISE_CODE]].apply(LabelEncoder().fit_transform)
-
-    if use_census:
-        df = census_prep.categorize_total_population(df)
-        df = census_prep.categorize_median_age(df)
-
-        df[[col_names.ZIP_CODE,
-            col_names.TOTAL_POPULATION_CATEGORIZED,
-            col_names.MEDIAN_AGE_CATEGORIZED]] = \
-            df[[col_names.ZIP_CODE,
-                col_names.TOTAL_POPULATION_CATEGORIZED,
-                col_names.MEDIAN_AGE_CATEGORIZED]].apply(LabelEncoder().fit_transform)
-
-        # df = census_prep.categorize_total_males_and_females(df)
-        # df[[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED]] = \
-        #     df[[col_names.FEMALE_TO_MALE_RATIO_CATEGORIZED]].apply(LabelEncoder().fit_transform)
-
+    if not use_census:
         df.drop(columns=[
-            col_names.ZIP_CODE,
-            col_names.TOTAL_MALES,
-            col_names.TOTAL_FEMALES
-        ], inplace=True)
-
-    else:
-        df.drop(columns=[
-            col_names.ZIP_CODE,
             col_names.TOTAL_POPULATION,
             col_names.TOTAL_MALES,
             col_names.TOTAL_FEMALES,
             col_names.MEDIAN_AGE
         ], inplace=True)
 
-    label = col_names.CRIME_CODE
+    df.drop(columns=[
+        col_names.ZIP_CODE
+    ], inplace=True)
+
+    label = 'CrimeCode'
     df = df.sample(frac=1).reset_index(drop=True)
     split_dfs = np.array_split(df, number_of_folds)
 
-    clf = CategoricalNB()
+    neigh = KNeighborsClassifier(n_neighbors=number_of_neighbors)
     actual_y = list()
     predicted_y = list()
 
@@ -93,11 +75,23 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int,
         y = train_set[[label]]
         x = train_set.drop([label], axis=1)
 
-        clf.fit(x, y.values.ravel())
+        neigh.fit(x, y.values.ravel())
 
         actual_y.extend(test_set[label].to_list())
         test_x = test_set.drop([label], axis=1)
 
-        predicted_y.extend(list(clf.predict(test_x)))
+        predicted_y.extend(list(neigh.predict(test_x)))
 
     reporter.report(df, actual_y, predicted_y)
+
+
+def obtain_ohe_df(df, column_names):
+    for column_name in column_names:
+        # Get one hot encoding
+        one_hot = pd.get_dummies(df[column_name], prefix=column_name)
+        # Drop column B as it is now encoded
+        df = df.drop(column_name, axis=1)
+        # Join the encoded df
+        df = df.join(one_hot)
+
+    return df

@@ -15,7 +15,7 @@ def classify_and_report(df: pd.DataFrame, number_of_folds: int,
 
     if number_of_labels == conf.USE_11_LABELS:
         df = df.groupby(col_names.CRIME_CODE).filter(lambda x: len(x) > 50000)
-    elif number_of_labels == conf.USE_5_LABELS:
+    elif number_of_labels == conf.USE_4_LABELS:
         df = crime_prep.merge_crime_codes(df)
 
     if undersample:

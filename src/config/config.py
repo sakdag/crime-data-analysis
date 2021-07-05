@@ -4,13 +4,14 @@ PREPROCESS_CENSUS_DATASET_MODE = 'preprocess_census'
 CORRELATE_CRIME_DATASET_MODE = 'correlate'
 CLASSIFY_WITH_CATEGORICAL_NB_MODE = 'classify_cnb'
 CLASSIFY_WITH_LGBM_MODE = 'classify_lgbm'
+CLASSIFY_WITH_KNN_MODE = 'classify_knn'
 VISUALIZE_MODE = 'visualize'
 MERGE_DATASETS_MODE = 'merge_datasets'
 
 # Dataset modes
 USE_72_LABELS = '72_labels'
 USE_11_LABELS = '11_labels'
-USE_5_LABELS = '5_labels'
+USE_4_LABELS = '4_labels'
 
 # Categorical column handling modes:
 ONE_HOT_ENCODING = 'one_hot_encoding'

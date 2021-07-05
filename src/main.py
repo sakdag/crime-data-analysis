@@ -9,6 +9,7 @@ import src.utils.crime_classification_utils as utils
 import src.correlation.dataset_correlation as correlation
 import src.classification.crime_classification_categorical_nb as categorical_nb
 import src.classification.crime_classification_lgbm as lgbm
+import src.classification.crime_classification_knn as knn
 import src.utils.visualization as visualizer
 
 if __name__ == "__main__":
@@ -115,6 +116,32 @@ if __name__ == "__main__":
 
         lgbm.classify_and_report(crime_df, number_of_folds, categorical_column_handling_method,
                                  number_of_labels, use_census, undersample)
+
+    elif mode == conf.CLASSIFY_WITH_KNN_MODE:
+        crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
+        number_of_folds = 3
+        k_value = 3
+        categorical_column_handling_method = 'label_encoding'
+        use_census = False
+        number_of_labels = conf.USE_72_LABELS
+        undersample = False
+
+        for i in range(2, len(sys.argv)):
+            if sys.argv[i].split('=')[0] == 'k_value':
+                k_value = int(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'number_of_folds':
+                number_of_folds = int(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'categorical_column_handling_method':
+                categorical_column_handling_method = str(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'use_census':
+                use_census = (sys.argv[i].split('=')[1] == 'true')
+            if sys.argv[i].split('=')[0] == 'number_of_labels':
+                number_of_labels = sys.argv[i].split('=')[1]
+            if sys.argv[i].split('=')[0] == 'undersample':
+                undersample = (sys.argv[i].split('=')[1] == 'true')
+
+        knn.classify_and_report(crime_df, k_value, number_of_folds, categorical_column_handling_method,
+                                number_of_labels, use_census, undersample)
 
     elif mode == conf.VISUALIZE_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)

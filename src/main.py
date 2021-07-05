@@ -97,14 +97,24 @@ if __name__ == "__main__":
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
         number_of_folds = 3
         categorical_column_handling_method = 'label_encoding'
+        use_census = False
+        number_of_labels = conf.USE_72_LABELS
+        undersample = False
 
         for i in range(2, len(sys.argv)):
             if sys.argv[i].split('=')[0] == 'number_of_folds':
                 number_of_folds = int(sys.argv[i].split('=')[1])
             if sys.argv[i].split('=')[0] == 'categorical_column_handling_method':
                 categorical_column_handling_method = str(sys.argv[i].split('=')[1])
+            if sys.argv[i].split('=')[0] == 'use_census':
+                use_census = (sys.argv[i].split('=')[1] == 'true')
+            if sys.argv[i].split('=')[0] == 'number_of_labels':
+                number_of_labels = sys.argv[i].split('=')[1]
+            if sys.argv[i].split('=')[0] == 'undersample':
+                undersample = (sys.argv[i].split('=')[1] == 'true')
 
-        lgbm.classify_and_report(crime_df, number_of_folds, categorical_column_handling_method)
+        lgbm.classify_and_report(crime_df, number_of_folds, categorical_column_handling_method,
+                                 number_of_labels, use_census, undersample)
 
     elif mode == conf.VISUALIZE_MODE:
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)

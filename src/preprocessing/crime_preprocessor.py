@@ -78,8 +78,6 @@ def preprocess_and_save(original_file_name: str,
 
 def preprocess_and_save_before_ohe(df: pd.DataFrame):
 
-    df = categorize_victim_age(df)
-
     night = df.loc[df[col_names.TIME_OCCURRED] <= 1]
     night.loc[night[col_names.TIME_OCCURRED] <= 1, col_names.TIME_OCCURRED] = 'Night'
 

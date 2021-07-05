@@ -8,29 +8,52 @@ import src.preprocessing.crime_preprocessor as crime_prep
 import src.utils.classification_reporter as reporter
 import src.config.column_names as col_names
 
-def classify_and_report(df: pd.DataFrame, number_of_folds: int, mode: str, use_census: bool = False):
-    columns_to_drop = {'DRNumber', 'CrimeCodeDescription',
-                       'PremiseDescription', 'Latitude', 'Longitude'}
+
+def classify_and_report(df: pd.DataFrame, number_of_folds: int,
+                        mode: str, number_of_labels: str = conf.USE_72_LABELS, use_census: bool = False,
+                        undersample: bool = True):
+
+    if number_of_labels == conf.USE_11_LABELS:
+        df = df.groupby(col_names.CRIME_CODE).filter(lambda x: len(x) > 50000)
+    elif number_of_labels == conf.USE_5_LABELS:
+        df = crime_prep.merge_crime_codes(df)
+
+    if undersample:
+        df = df.sample(frac=1).reset_index(drop=True)
+        dfs = dict(tuple(df.groupby(col_names.CRIME_CODE)))
+
+        # Get number of instances in the smallest df
+        sample_size = min([len(current_df) for current_df in list(dfs.values())])
+
+        # Modify each dataframe such that all have sample_size samples
+        modified_dfs = [modified_df.sample(n=sample_size) for modified_df in dfs.values()]
+
+        df = pd.concat(modified_dfs)
+
+    columns_to_drop = {col_names.DR_NUMBER, col_names.CRIME_CODE_DESCRIPTION,
+                       col_names.PREMISE_DESCRIPTION}
     df = df.drop(columns=columns_to_drop)
 
     if mode == conf.LABEL_ENCODING:
-        df = crime_prep.categorize_victim_age(df)
-        df[['VictimSex', 'VictimDescent', 'VictimAge']] = df[['VictimSex', 'VictimDescent', 'VictimAge']].apply(
-            LabelEncoder().fit_transform)
+        df[[col_names.VICTIM_SEX, col_names.VICTIM_DESCENT, col_names.PREMISE_CODE]] = \
+            df[[col_names.VICTIM_SEX,
+                col_names.VICTIM_DESCENT,
+                col_names.PREMISE_CODE]].apply(LabelEncoder().fit_transform)
     elif mode == conf.ONE_HOT_ENCODING:
         df = crime_prep.preprocess_and_save_before_ohe(df)
-        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimAge', 'VictimSex', 'VictimDescent', 'MonthOccurred', 'DayOfWeek'])
+        df = obtain_ohe_df(df, ['TimeOccurred', 'VictimSex', 'VictimDescent', 'MonthOccurred', 'DayOfWeek'])
 
-    if use_census:
-        pass
-    else:
+    if not use_census:
         df.drop(columns=[
-            col_names.ZIP_CODE,
             col_names.TOTAL_POPULATION,
             col_names.TOTAL_MALES,
             col_names.TOTAL_FEMALES,
             col_names.MEDIAN_AGE
         ], inplace=True)
+
+    df.drop(columns=[
+        col_names.ZIP_CODE
+    ], inplace=True)
 
     label = 'CrimeCode'
     df = df.sample(frac=1).reset_index(drop=True)

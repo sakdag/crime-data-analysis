@@ -11,7 +11,7 @@ import src.config.config as conf
 
 
 def classify_and_report(df: pd.DataFrame, number_of_folds: int,
-                        number_of_labels: str = conf.USE_72_LABELS, use_census: bool = False,
+                        number_of_labels: str = conf.USE_76_LABELS, use_census: bool = False,
                         undersample: bool = True):
 
     if number_of_labels == conf.USE_11_LABELS:

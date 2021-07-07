@@ -79,7 +79,7 @@ if __name__ == "__main__":
         crime_df = utils.read_dataset(preprocessed_crime_dataset_file_path)
         number_of_folds = 3
         use_census = False
-        number_of_labels = conf.USE_72_LABELS
+        number_of_labels = conf.USE_76_LABELS
         undersample = False
 
         for i in range(2, len(sys.argv)):
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         number_of_folds = 3
         categorical_column_handling_method = 'label_encoding'
         use_census = False
-        number_of_labels = conf.USE_72_LABELS
+        number_of_labels = conf.USE_76_LABELS
         undersample = False
 
         for i in range(2, len(sys.argv)):
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         k_value = 3
         categorical_column_handling_method = 'label_encoding'
         use_census = False
-        number_of_labels = conf.USE_72_LABELS
+        number_of_labels = conf.USE_76_LABELS
         undersample = False
 
         for i in range(2, len(sys.argv)):

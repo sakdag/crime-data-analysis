@@ -9,7 +9,7 @@ VISUALIZE_MODE = 'visualize'
 MERGE_DATASETS_MODE = 'merge_datasets'
 
 # Dataset modes
-USE_72_LABELS = '72_labels'
+USE_76_LABELS = '76_labels'
 USE_11_LABELS = '11_labels'
 USE_4_LABELS = '4_labels'
 

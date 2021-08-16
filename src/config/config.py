@@ -18,17 +18,17 @@ ONE_HOT_ENCODING = 'one_hot_encoding'
 LABEL_ENCODING = 'label_encoding'
 
 # Original file paths
-CRIME_DATASET_FILE_PATH = 'data/Crime_Data_2010_2017.csv'
-CENSUS_DATASET_FILE_PATH = 'data/2010-census-populations-by-zip-code.csv'
+CRIME_DATASET_FILE_PATH = '../data/raw/Crime_Data_2010_2017.csv'
+CENSUS_DATASET_FILE_PATH = '../data/raw/2010-census-populations-by-zip-code.csv'
 
 # Preprocessed crime dataset file paths
-PREPROCESSED_CRIME_DATASET_FILE_PATH = 'data/crime_data_2010_2017_preprocessed.csv'
-PREPROCESSED_CRIME_DATASET_FILE_PATH_WO_NAN = 'data/crime_data_2010_2017_preprocessed_drop_nan.csv'
-PREPROCESSED_CRIME_DATASET_FILE_PATH_OHE = '../crime_data_2010_2017_preprocessed_ole.csv'
-CORRELATED_CRIME_DATASET_FILE_PATH = 'data/crime_data_2010_2017_correlated.csv'
+PREPROCESSED_CRIME_DATASET_FILE_PATH = '../data/processed/crime_data_2010_2017_preprocessed.csv'
+PREPROCESSED_CRIME_DATASET_FILE_PATH_WO_NAN = '../data/processed/crime_data_2010_2017_preprocessed_drop_nan.csv'
+PREPROCESSED_CRIME_DATASET_FILE_PATH_OHE = '../data/processed/crime_data_2010_2017_preprocessed_ole.csv'
+CORRELATED_CRIME_DATASET_FILE_PATH = '../data/processed/crime_data_2010_2017_correlated.csv'
 
 # Preprocessed census dataset file paths
-PREPROCESSED_CENSUS_DATASET_FILE_PATH = 'data/2010-census-populations-by-zip-code-preprocessed.csv'
+PREPROCESSED_CENSUS_DATASET_FILE_PATH = '../data/processed/2010-census-populations-by-zip-code-preprocessed.csv'
 
 # Additional dataset file paths
-ZIP_CODES_DATASET_FILE_PATH = 'data/uszips.csv'
+ZIP_CODES_DATASET_FILE_PATH = '../data/raw/uszips.csv'

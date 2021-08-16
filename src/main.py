@@ -1,6 +1,8 @@
 import os
 import sys
 
+import pandas as pd
+
 import src.config.config as conf
 import src.config.crime_code_constants as constants
 import src.preprocessing.crime_preprocessor as crime_prep
